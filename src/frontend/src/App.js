@@ -1,73 +1,52 @@
-import React, { useState, useEffect } from 'react';
-import { EditorState } from 'draft-js';
-import { Editor } from 'react-draft-wysiwyg';
-import { convertToHTML } from 'draft-convert';
-import DOMPurify from 'dompurify';
-import { jsPDF } from "jspdf";
+import React from 'react';
+import { useState, useEffect } from 'react';
+import { Link, Route, Routes } from "react-router-dom";
 
-import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
+import SignUpForm from './pages/signup/signup.js';
+import LoginForm from './pages/login/login.js';
+import Context from './context.js';
+import Home from './pages/Home/home.js'
+import Documents from './pages/Documents/Documents.js'
+
 import './App.css';
+import { EditorState } from 'draft-js';
+import { convertToHTML } from 'draft-convert';
+
+import { Editor } from 'react-draft-wysiwyg';
 
 
 function App() {
-  const [editorState, setEditorState] = useState(
-    () => EditorState.createEmpty(),
-  );
-  const [convertedContent, setConvertedContent] = useState(null);
-
-  useEffect(() => {
-    let html = convertToHTML(editorState.getCurrentContent());
-    setConvertedContent(html);
-  }, [editorState]);
-
-  function createMarkup(html) {
-    console.log("hello")
-    return {
-      __html: DOMPurify.sanitize(html)
+  // const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState(null);
+  const initAuthUser = () => {
+    const authenticatedUser = localStorage.getItem('auth');
+    if (authenticatedUser) {
+      setUser(JSON.parse(authenticatedUser));
     }
-  }
-
-  const handleClick = (event, convertedContent) => {
-    console.log(event);
-    console.log(convertedContent);
-    var doc = new jsPDF();
-      
-    // Source HTMLElement or a string containing HTML.
-    
-    doc.html(convertedContent, {
-        callback: function(doc) {
-            // Save the PDF
-            doc.save('sample-document.pdf');
-        },
-        x: 15,
-        y: 15,
-        width: 170, //target width in the PDF document
-        windowWidth: 650 //window width in CSS pixels
-    });
-    // doc.save('sample-document.pdf');
-  
   };
+  useEffect(() => {
+    initAuthUser();
+  }, []);
+
 
   return (
+    <Context.Provider value={{user, setUser}}>
+
     <div className="App">
-      <header className="App-header">
-        Rich Text Editor Example
-      </header>
-      <Editor
-        editorState={editorState}
-        onEditorStateChange={setEditorState}
-        wrapperClassName="wrapper-class"
-        editorClassName="editor-class"
-        toolbarClassName="toolbar-class"
-      />
-      <div
-        className="preview"
-        dangerouslySetInnerHTML={createMarkup(convertedContent)}>
-      </div>
-      <button id="printButton"  onClick={event => handleClick(event, convertedContent)}>Print</button>
+      <Routes>
+        <Route path="/" element={<Home />} />
+
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/signup" element={<SignUpForm />} />
+        <Route path="/documents" element={<Documents />} />   
+
+        </Routes>
 
     </div>
-  )
-}
+    {/* {isLoading && <Loading />} */}
 
+    </Context.Provider>
+
+  );
+}
 export default App;

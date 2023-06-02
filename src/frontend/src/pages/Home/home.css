@@ -1,0 +1,22 @@
+/* .wrapper-class {
+    padding: 1rem;
+    border: 1px solid #ccc;
+  }
+  .editor-class {
+    background-color:lightgray;
+    padding: 1rem;
+    border: 1px solid #ccc;
+  }
+  .toolbar-class {
+    border: 1px solid #ccc;
+  } */
+
+  .horizontal-toolbar .rdw-editor-toolbar {
+    display: inline-block;
+    flex-wrap: wrap;
+  }
+  
+  .horizontal-toolbar .rdw-option-wrapper {
+    display: inline-block;
+    margin-right: 10px;
+  }

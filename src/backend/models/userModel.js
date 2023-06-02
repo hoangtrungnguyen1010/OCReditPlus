@@ -2,8 +2,6 @@ var mongoose = require('mongoose');
  
 var userSchema = mongoose.Schema({
 
-    uid: String,
-
     name: String,
 
     email: {
@@ -18,6 +16,6 @@ var userSchema = mongoose.Schema({
 
 });
  
-var User = mongoose.model('User', userSchema);
+var User = mongoose.model('UserTKPM', userSchema);
  
 module.exports = User;

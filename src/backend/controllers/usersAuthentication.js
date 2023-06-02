@@ -9,6 +9,7 @@ const User = require('../models/userModel')
 const registerUser = asyncHandler(async (req, res) => {
   const { uid, name, email, password, avatar} = req.body
 
+  console.log(req.body)
   if (!uid || !name || !email || !password) {
     console.log(uid)
     console.log(name)
@@ -62,10 +63,11 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
+  console.log(req.body);
   // Check for user email
   const user = await User.findOne({ email })
 
-
+console.log(user)
   if (user && (await bcrypt.compare(password, user.password))) {
     res.json({
       _id: user.id,
