@@ -35,6 +35,5 @@ app.use("/api/documents", require("./routes/ocrRoute"));
 app.use("/api/document", require("./routes/documentRoute"));
 
 app.get('/', (req, res) =>{
-    console.log("hi")
 })
 app.listen(port, () => console.log(`Server started on port ${port}`));

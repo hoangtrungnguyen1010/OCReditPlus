@@ -19,6 +19,9 @@ import LanSelect from '../../components/LanguageDropdown/LanguageDropdown.js';
 import Context from '../../context.js'
 import Navigation from '../../components/Naviation/Navigation.js';
 import { Editor } from 'react-draft-wysiwyg';
+import * as htmlToImage from 'html-to-image';
+import { jsPDF } from "jspdf";
+
 const Home = () => {
     const {user} = useContext(Context)
     const [selectedFile, setSelectedFile] = useState(null);
@@ -43,7 +46,6 @@ const Home = () => {
         const res =  await axios.get(url);
 
         setLanList(res.data.lan)
-        console.log(res.data.lan)
         }
         fetchData();
     }, [])
@@ -82,10 +84,8 @@ const Home = () => {
     };
   
     const handleEditorChange = (newContent) => {
-        console.log(newContent)
 
         const newContentState = ContentState.createFromText(String(newContent));
-        // const convertedState = convertFromRaw(JSON.parse(newEditorState))
         const editorState = EditorState.createWithContent(newContentState);
         
         setEditorState(editorState);
@@ -93,20 +93,10 @@ const Home = () => {
       };
     
     const handleSubmit = async()=>{
-        // console.log(convertedContent)
-        // if(convertedContent){
-
-        console.log('success')
-        console.log(user)
-        console.log(user._id)
-        console.log(articleName.current.value)
 
 
         const url = "http://localhost:8080/api/document/save";
         const res =  await axios.post(url, {user_uid: user._id, fileName: articleName.current.value, content:  convertedContent});
-        if (res){
-            console.log('success')
-        }
 
     }
     function createMarkup(html) {
@@ -116,9 +106,22 @@ const Home = () => {
         }
       }
     
-    const handleDownload = async()=>{
+      const handleDownload = async()=>{
         
+        const element = document.getElementById('previewText');
+        console.log(element)
+        htmlToImage
+          .toPng(element)
+          .then(function (dataUrl) {
+            var doc = new jsPDF();
+            doc.addImage(dataUrl, 'PNG', 15, 40);
+            doc.save('downloadFiles.pdf');
+          })
+          .catch(function (error) {
+            console.error('Error:', error);
+          });
       };
+
     
     const handleReset = ()=>{
         setEditorState(EditorState.createEmpty());
