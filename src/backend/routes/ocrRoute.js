@@ -5,7 +5,6 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 const {OCRtoText, getLanList} = require("../controllers/ocr");
-// const { protect } = require("../middleware/authMiddleware");
 
 router.post("/ocrtotext",upload.single('file'), OCRtoText);
 

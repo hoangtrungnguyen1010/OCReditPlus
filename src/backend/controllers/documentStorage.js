@@ -17,11 +17,6 @@ const saveDocument = asyncHandler(async (req, res) => {
 
   console.log(document)
   newDoc = await Document.create(document);
-  // Document.insertOne(document, function (err, result) {
-  // if (err) {
-  //   console.error('Error inserting document:', err);
-  //   return;
-  // }
 
 })
 
@@ -29,10 +24,6 @@ const getListOfDocumentNames = asyncHandler(async (req, res) => {
   const user_uid = req.params.id;
   console.log(user_uid);
   const Documents = await Document.find({ user_uid: user_uid });
-
-  // const listOfName = Documents.map(doc => ({
-  //   fileName: doc.fileName
-  // }));
 
   if (Documents) {
     res.status(200).json(Documents);
@@ -61,9 +52,9 @@ const downloadDocument = asyncHandler(async (req, res) => {
 })
 
 const deleteDocument = asyncHandler(async (req, res) => {
-  const user_uid = req.params.id;
-  const fileName = req.params.filename;
-  console.log(req.params)
+  const { user_uid, fileName} = req.body;
+
+  console.log(fileName)
   try {
     const result = await Document.deleteOne({ user_uid: user_uid, fileName: fileName});
     res.status(200).json(`The document deleted`);

@@ -1,8 +1,5 @@
 import React from 'react';
 import DOMPurify from 'dompurify';
-import * as htmlToImage from 'html-to-image';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
-
 import { useEffect, useRef, useContext, useState } from "react";
 // import validator from "validator";
 import { useNavigate, NavLink } from 'react-router-dom';
@@ -22,7 +19,6 @@ import LanSelect from '../../components/LanguageDropdown/LanguageDropdown.js';
 import Context from '../../context.js'
 import Navigation from '../../components/Naviation/Navigation.js';
 import { Editor } from 'react-draft-wysiwyg';
-import { jsPDF } from "jspdf";
 const Home = () => {
     const {user} = useContext(Context)
     const [selectedFile, setSelectedFile] = useState(null);
@@ -42,7 +38,7 @@ const Home = () => {
   
     useEffect(()=>{
         async function fetchData(){
-        const url = "http://localhost:8000/api/documents/lanlist";
+        const url = "http://localhost:8080/api/documents/lanlist";
 
         const res =  await axios.get(url);
 
@@ -68,7 +64,7 @@ const Home = () => {
             formData.append('lan', selectedLan);
 
             if (selectedFile) {
-                const url = "http://localhost:8000/api/documents/ocrtotext";
+                const url = "http://localhost:8080/api/documents/ocrtotext";
                 const res =  await axios.post(url, formData, {
                     headers: {
                       'Content-Type': 'multipart/form-data',
@@ -106,7 +102,7 @@ const Home = () => {
         console.log(articleName.current.value)
 
 
-        const url = "http://localhost:8000/api/document/save";
+        const url = "http://localhost:8080/api/document/save";
         const res =  await axios.post(url, {user_uid: user._id, fileName: articleName.current.value, content:  convertedContent});
         if (res){
             console.log('success')
@@ -122,18 +118,6 @@ const Home = () => {
     
     const handleDownload = async()=>{
         
-        const element = document.getElementById('previewText');
-        console.log(element)
-        htmlToImage
-          .toPng(element)
-          .then(function (dataUrl) {
-            var doc = new jsPDF();
-            doc.addImage(dataUrl, 'PNG', 15, 40);
-            doc.save('minimal.pdf');
-          })
-          .catch(function (error) {
-            console.error('Error:', error);
-          });
       };
     
     const handleReset = ()=>{
@@ -158,19 +142,6 @@ return(
         <link href="https://fonts.googleapis.com/css?family=Montserrat:400,700,200" rel="stylesheet"/>
         <link href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet"/>
         <link href="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.css" rel="stylesheet"/>
-        {/* <script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote.min.js"></script> */}
-
-        {/* <script src='../../assets/js/core/jquery.min.js'>
-        <script src="../../assets/js/core/jquery.min.js"></script> */}
-        {/* <script src="../assets/js/core/popper.min.js"></script>
-        <script src="../assets/js/core/bootstrap.min.js"></script>
-        <script src="../assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
-        <script src="../assets/js/plugins/chartjs.min.js"></script>
-        <script src="../assets/js/plugins/bootstrap-notify.js"></script>
-        <script src="../assets/js/paper-dashboard.min.js?v=2.0.1" type="text/javascript"></script>
-        <script src="../assets/demo/demo.js"></script>
-        <script src="../assets/js/upload.js"></script>
-        <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script> */}
 
         </Helmet>
         <div class="sidebar" data-color="white" data-active-color="danger">

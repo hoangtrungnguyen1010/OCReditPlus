@@ -63,7 +63,7 @@ const SignUpForm = () => {
     };
   
     const createUser = async ({ id, email, password, fullname, avatar }) => {
-      const url = "http://localhost:8000/api/users";
+      const url = "http://localhost:8080/api/users";
   
       return await axios.post(url, {uid:id,  name: fullname, email: email, password: password, avatar: avatar});
   

@@ -3,42 +3,7 @@ import { useEffect, useRef, useContext, useState } from "react";
 import { Helmet } from 'react-helmet'
 import Context from '../../context.js';
 import axios from "axios";
-import { jsPDF } from "jspdf";
-import html2canvas from 'html2canvas'
-import html2pdf from 'html2pdf.js';
-import 'jspdf-autotable';
-import * as htmlToImage from 'html-to-image';
-import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 
-import { PDFDownloadLink, PDFViewer, Page, View, Document, Font } from '@react-pdf/renderer';
-// import '../../assets/fonts/arial-unicode-ms.ttf'
-
-// Load the font that supports Vietnamese Unicode characters
-Font.register({
-  family: 'Arial Unicode MS',
-  src: '../../assets/fonts/arial-unicode-ms.ttf',
-});
-
-const MyDocument = ({ strhtml }) => {
-    // const stringToHTML = (string) => {
-    //     const parser = new DOMParser();
-    //     const doc = parser.parseFromString(string, 'text/html');
-    //     return doc.body.firstChild;
-    //   };
-    // const [html, setHtml] =useState(null)
-    // useEffect(()=>{
-    //     setHtml(stringToHTML(strhtml))
-    
-    // },[])
-  return (
-    <Document>
-      <Page>
-        <View style={{ fontFamily: 'Arial Unicode MS' }} dangerouslySetInnerHTML={{ __html: strhtml }} />
-      </Page>
-    </Document>
-  );
-};
-// import times from '../../assets/fonts/Times-New-Roman/times.ttf'
 import { useNavigate, NavLink } from 'react-router-dom';
 const Documents = () => {
     const { user } = useContext(Context);
@@ -57,7 +22,7 @@ const Documents = () => {
         console.log(user._id)
 
         async function fetchData() {
-            const url = `http://localhost:8000/api/document/listdocuments/${user._id}`;
+            const url = `http://localhost:8080/api/document/listdocuments/${user._id}`;
             const response = await axios.get(url);
             const documents = response.data;
             console.log(response.data)
@@ -70,8 +35,9 @@ const Documents = () => {
 
     const handleDelete = async (document) => {
         try {
-            const url = `http://localhost:8000/api/document/delete/${user._id}/${document.fileName}`;
-            const response = await axios.get(url);
+            const url = `http://localhost:8080/api/document/delete`;
+            const res =  await axios.post(url, {user_uid: user._id, fileName: document.fileName})
+
             setDocuments((prevDocuments) =>
                 prevDocuments.filter((doc) => doc.fileName !== document.fileName)
             );
@@ -82,158 +48,9 @@ const Documents = () => {
 
 
     }
-    const stringToHTML = (string) => {
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(string, 'text/html');
-        console.log(doc.body.firstChild)
-        console.log(doc)
 
-        return doc.body.firstChild;
-      };
       
-      const saveAsPDF = () => {
-        const element = document.getElementById('ticket');
-        console.log(element)
-        console.log(typeof element)
-        const htmlString = '<div id="ticket"><h1>Hello, co!</h1></div>';
-        const htmlElement = stringToHTML(htmlString);
-        console.log(htmlElement)
-        console.log(typeof htmlElement)
-
-        if (element !== htmlElement){
-            console.log(element)
-            console.log(htmlElement)
-
-        }
-        if (!htmlElement) {
-          console.error('Element not found');
-          return;
-        }
-    
-        htmlToImage
-          .toPng(htmlElement)
-          .then(function (dataUrl) {
-            var doc = new jsPDF();
-            doc.addImage(dataUrl, 'PNG', 15, 40);
-            doc.save('minimal.pdf');
-          })
-          .catch(function (error) {
-            console.error('Error:', error);
-          });
-      };
-    
-    const saveAsPDFq = () => {
-          const htmlString = '<div id="ticket"><h1>Hello, co!</h1></div>';
-
-          // Create a temporary element
-          const tempElement = document.createElement('div');
-          
-          // Set the HTML string as the innerHTML
-          tempElement.innerHTML = htmlString;
-          
-          // Access the child nodes
-          const htmlElements = tempElement.childNodes;
-          
-          // Do something with the HTML elements
-          htmlElements.forEach((element) => {
-            console.log(element);
-            // You can append the element to the DOM or perform any other operations
-          });
-          console.log(tempElement)
-          const htmlElement = stringToHTML(htmlString);
-          
-        // const htmlContent = '<p>Hello mình là trung đây</p>';
-        // const elementToPrint = document.getElementById('navigation');
-
-        htmlToImage.toPng(tempElement)
-             .then(function(dataUrl) {
-               var doc = new jsPDF();
-               doc.addImage(dataUrl, 'PNG', 15, 40);
-               doc.save('pension-report' + '.pdf');
-             });
-      };
-      
-    const handleDownload = async (document) => {
-        const url = `http://localhost:8000/api/document/download/${user._id}/${document.fileName}`;
-        const response = await axios.get(url);
-        const downloadDocument = response.data;
-        console.log(downloadDocument)
-        const htmlContent = '<p>Hello mình là trung đây</p>';
-
-        const pdf = new jsPDF();
-      
-        // Convert HTML to PDF
-        html2pdf().from(htmlContent).toPdf().get('pdf').then((pdfDocument) => {
-          // Add the PDF pages to the jsPDF instance
-          const pages = pdfDocument.getNumPages();
-          for (let i = 1; i <= pages; i++) {
-            const pageData = pdfDocument.getPageData(i);
-            const pageNumber = pdf.addPage([pageData.width, pageData.height]);
-            pdf.setPage(pageNumber);
-            pdf.addImage(pageData.data, 'JPEG', 0, 0, pageData.width, pageData.height);
-          }
-      
-          // Save the PDF
-          pdf.save('document.pdf');
-        });
-      
-        // const pdf = new jsPDF('p', 'pt', 'a4');
-        // const parser = new DOMParser();
-
-        // // Parse the HTML string
-        // const htmlDocument = parser.parseFromString(htmlString, 'text/html');
-        // console.log(htmlDocument)
-        // // Access the HTML element
-        // const htmlElement = htmlDocument.documentElement;
-        // console.log(htmlElement)
-
-        // // Select the element containing the HTML content
-    
-        // // Convert HTML content to canvas
-        // const canvas = await html2canvas(htmlElement);
-        // console.log(canvas)
-        // // Convert canvas to an image URL
-        // const imgData = canvas.toDataURL('image/png');
-        // console.log(canvas)
-
-        // // Add the image to the PDF
-        // pdf.addImage(imgData, 'PNG', 0, 0, pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
-        // console.log(canvas)
-
-        // // Save the PDF
-        // pdf.save('document.pdf');
-    
-        // var customFont = {
-        //     'TimesNewRoman': {
-        //       normal: '../../assets/fonts/Times-New-Roman/times.ttf'
-        //     }
-        //   };
-          
-        //   // Register the font
-        //   doc.addFont('../../assets/fonts/Times-New-Roman/times.ttf', 'TimesNewRoman', 'normal');
-          
-          // Register the font
-        // doc.addFont('../../assets/fonts/Times-New-Roman/times.ttf', 'TimesNewRoman', 'normal');
-        // doc.addFont('../../assets/fonts/Times-New-Roman/times.ttf', 'TimesNewRoman', 'normal');
-        // doc.addFont('../../assets/fonts/Times-New-Roman/times.ttf', 'TimesNewRoman', 'normal');
-        // doc.addFont('../../assets/fonts/Times-New-Roman/times.ttf', 'TimesNewRoman', 'normal');
-
-        // doc.setFont('times');
-        // doc.text('Xin chào thế giới!',15, 15);
-        // console.log(doc.getFontList());
-        // doc.save(document.fileName + '.pdf');
-        // console.log(doc.getFont());
-        // doc.html(downloadDocument, {
-        //     callback: function (doc) {
-        //         // Save the PDF
-        //         doc.save(document.fileName + '.pdf');
-        //     },
-        //     x: 15,
-        //     y: 15,
-        //     width: 170, //target width in the PDF document
-        //     windowWidth: 650 //window width in CSS pixels
-        // });
-    }
+    const handleDownload = async () => {}
 
     return (
         <div>
@@ -371,7 +188,7 @@ const Documents = () => {
                                                         <td>
                                                             <button class="btn btn-warning">Update</button>
                                                             <button class="btn btn-danger" onClick={() => handleDelete(document)}>Delete</button>
-                                                            <button class="btn button-success" onClick={saveAsPDF} > Download
+                                                            <button class="btn button-success" onClick={handleDownload} > Download
                                                             {/* <PDFDownloadLink document={<MyDocument html={document.content} />} fileName="document.pdf">
                                                                 {({ blob, url, loading, error }) =>{
                                                                     if (!loading) {
